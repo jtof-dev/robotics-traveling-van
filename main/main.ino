@@ -5,13 +5,9 @@ const int LEFT_MOTOR_IN2 = 5;
 const int RIGHT_MOTOR_IN1 = 6;
 const int RIGHT_MOTOR_IN2 = 9;
 
-const int DEAD_ZONE_LOW = 492;
-const int DEAD_ZONE_HIGH = 532;
-
-
 void setup() {
   Serial.begin(9600);
-  Serial.println("Robot Cart Controller Initialized");
+  Serial.println("robot cart controller initialized");
 
   pinMode(LEFT_MOTOR_IN1, OUTPUT);
   pinMode(LEFT_MOTOR_IN2, OUTPUT);
@@ -24,21 +20,24 @@ void setup() {
 
 void loop() {
   int potValue = analogRead(POTENTIOMETER_PIN);
-
-  Serial.print("Potentiometer Value: ");
+  Serial.print("potentiometer value: ");
   Serial.println(potValue);
+
+  // here, take the pot value and input into PID_v1.h
+  // looks like it will take lots of tinkering to get right
 
   delay(100);
 }
 
 
+// function to set motor speed, pos numbers to move forward and neg numbers to move backward
 void setMotors(int speed) {
   if (speed > 0) {
     analogWrite(LEFT_MOTOR_IN1, speed);
     digitalWrite(LEFT_MOTOR_IN2, LOW);
     analogWrite(RIGHT_MOTOR_IN1, speed);
     digitalWrite(RIGHT_MOTOR_IN2, LOW);
-    Serial.print("Forward - Speed: ");
+    Serial.print("forward - speed: ");
     Serial.println(speed);
     
   } else if (speed < 0) {
@@ -46,7 +45,7 @@ void setMotors(int speed) {
     analogWrite(LEFT_MOTOR_IN2, abs(speed));
     digitalWrite(RIGHT_MOTOR_IN1, LOW);
     analogWrite(RIGHT_MOTOR_IN2, abs(speed));
-    Serial.print("Reverse - Speed: ");
+    Serial.print("reverse - speed: ");
     Serial.println(abs(speed));
     
   } else {
@@ -55,14 +54,10 @@ void setMotors(int speed) {
 }
 
 
-/**
- * @brief Stops all motors by setting both control pins LOW (brake).
- */
 void stopMotors() {
   digitalWrite(LEFT_MOTOR_IN1, LOW);
   digitalWrite(LEFT_MOTOR_IN2, LOW);
   digitalWrite(RIGHT_MOTOR_IN1, LOW);
   digitalWrite(RIGHT_MOTOR_IN2, LOW);
-  Serial.println("Motors Stopped");
+  Serial.println("motors stopped");
 }
-
