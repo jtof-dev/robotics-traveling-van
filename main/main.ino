@@ -1,3 +1,5 @@
+#include <PID_v1.h>
+
 const int POTENTIOMETER_PIN = A0;
 
 const int LEFT_MOTOR_IN1 = 3;
