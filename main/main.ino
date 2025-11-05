@@ -1,55 +1,61 @@
 #include <PID_v1.h>
 
-const int POTENTIOMETER_PIN = A0;
+// setting up the physical pins
+const int potPin = A0;
+const int leftMotorIn1 = 3;
+const int leftMotorIn2 = 5;
+const int rightMotorIn1 = 6;
+const int rightMotorIn2 = 9;
 
-const int LEFT_MOTOR_IN1 = 3;
-const int LEFT_MOTOR_IN2 = 5;
-const int RIGHT_MOTOR_IN1 = 6;
-const int RIGHT_MOTOR_IN2 = 9;
+double output, scaleFactor;
+double setPoint = 0;
 
+// very preliminary values for Kp, Ki, and Kd. will require lots of tinkering
+double Kp = 10.0;
+double Ki = 0.1;
+double Kd = 0.5;
+
+double angle;
+double motorCommand;
+
+// the PID controller expects an angle input, so my calculated angle will work as the input
+PID pid(&angle, &output, &setPoint, Kp, Ki, Kd, DIRECT)
+
+// the setup function that initializes pins and starts holding the brakes
 void setup() {
   Serial.begin(9600);
-  Serial.println("robot cart controller initialized");
 
-  pinMode(LEFT_MOTOR_IN1, OUTPUT);
-  pinMode(LEFT_MOTOR_IN2, OUTPUT);
-  pinMode(RIGHT_MOTOR_IN1, OUTPUT);
-  pinMode(RIGHT_MOTOR_IN2, OUTPUT);
+  pinMode(leftMotorIn1, OUTPUT);
+  pinMode(leftMotorIn2, OUTPUT);
+  pinMode(rightMotorIn1, OUTPUT);
+  pinMode(rightMotorIn2, OUTPUT);
 
   stopMotors();
-}
 
-
-void loop() {
-  int potValue = analogRead(POTENTIOMETER_PIN);
-  Serial.print("potentiometer value: ");
-  Serial.println(potValue);
-
-  // here, take the pot value and input into PID_v1.h
-  // looks like it will take lots of tinkering to get right
-
-  delay(100);
+  Serial.println("robot cart controller initialized");
 }
 
 
 // function to set motor speed, pos numbers to move forward and neg numbers to move backward
 void setMotors(int speed) {
   if (speed > 0) {
-    analogWrite(LEFT_MOTOR_IN1, speed);
-    digitalWrite(LEFT_MOTOR_IN2, LOW);
-    analogWrite(RIGHT_MOTOR_IN1, speed);
-    digitalWrite(RIGHT_MOTOR_IN2, LOW);
+    analogWrite(leftMotorIn1, speed);
+    digitalWrite(leftMotorIn2, LOW);
+
+    analogWrite(rightMotorIn1, speed);
+    digitalWrite(rightMotorIn2, LOW);
+
     Serial.print("forward - speed: ");
     Serial.println(speed);
-    
   } else if (speed < 0) {
-    digitalWrite(LEFT_MOTOR_IN1, LOW);
-    analogWrite(LEFT_MOTOR_IN2, abs(speed));
-    digitalWrite(RIGHT_MOTOR_IN1, LOW);
-    analogWrite(RIGHT_MOTOR_IN2, abs(speed));
+    digitalWrite(leftMotorIn1, LOW);
+    analogWrite(leftMotorIn2, abs(speed));
+
+    digitalWrite(rightMotorIn1, LOW);
+    analogWrite(rightMotorIn2, abs(speed));
+
     Serial.print("reverse - speed: ");
     Serial.println(abs(speed));
-    
   } else {
     stopMotors();
   }
@@ -57,9 +63,26 @@ void setMotors(int speed) {
 
 
 void stopMotors() {
-  digitalWrite(LEFT_MOTOR_IN1, LOW);
-  digitalWrite(LEFT_MOTOR_IN2, LOW);
-  digitalWrite(RIGHT_MOTOR_IN1, LOW);
-  digitalWrite(RIGHT_MOTOR_IN2, LOW);
+  digitalWrite(leftMotorIn1, LOW);
+  digitalWrite(leftMotorIn2, LOW);
+
+  digitalWrite(rightMotorIn1, LOW);
+  digitalWrite(rightMotorIn2, LOW);
+  
   Serial.println("motors stopped");
+}
+
+
+void loop() {
+  // int potValue = analogRead(potPin);
+  // Serial.print("\npotentiometer value: ");
+  // Serial.println(potValue);
+
+  angle = map(analogRead(potPin), 0, 1023, -900, 900) / 10.0;
+  Serial.print("\nangle: ")
+  Serial.println(angle)
+
+  pid.Compute();
+
+  delay(100);
 }

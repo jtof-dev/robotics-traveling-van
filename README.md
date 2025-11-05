@@ -2,9 +2,9 @@
 
 the code needed to power an inverted pendulum robot with four motors
 
-# notes to self
+- this code is made much simpler thanks to [this PID controller library](https://github.com/br3ttb/Arduino-PID-Library)
 
-- potentiometer will output values between 0 and 1023
+# notes to self
 
 ## DRV8871 motor driver
 
@@ -22,7 +22,7 @@ the code needed to power an inverted pendulum robot with four motors
 
 # to-do
 
-- [ ] write function that converts potentiometer values into what is needed for the PID controller
-- [ ] implement the PID_V1.h PID controller function call
+- [x] implement the PID_V1.h PID controller function call
+- [ ] take PID controller output and call motors
 - [ ] write code that keeps robot from rolling too far in either direction
 - [ ] implement touch screen and UI
