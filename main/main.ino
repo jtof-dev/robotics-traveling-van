@@ -1,6 +1,7 @@
 #include <PID_v1.h>
 
 // setting up the physical pins
+// for the motor pins, they have to be PWM pins
 const int potPin = A0;
 const int leftMotorIn1 = 3;
 const int leftMotorIn2 = 5;
@@ -19,43 +20,30 @@ double angle;
 double motorCommand;
 
 // the PID controller expects an angle input, so my calculated angle will work as the input
-PID pid(&angle, &output, &setPoint, Kp, Ki, Kd, DIRECT)
-
-// the setup function that initializes pins and starts holding the brakes
-void setup() {
-  Serial.begin(9600);
-
-  pinMode(leftMotorIn1, OUTPUT);
-  pinMode(leftMotorIn2, OUTPUT);
-  pinMode(rightMotorIn1, OUTPUT);
-  pinMode(rightMotorIn2, OUTPUT);
-
-  stopMotors();
-
-  Serial.println("robot cart controller initialized");
-}
+PID pid(&angle, &output, &setPoint, Kp, Ki, Kd, DIRECT);
 
 
-// function to set motor speed, pos numbers to move forward and neg numbers to move backward
-void setMotors(int speed) {
-  if (speed > 0) {
-    analogWrite(leftMotorIn1, speed);
+// function to set motor speed using PWM values, pos numbers to move forward and neg numbers to move backward
+void setMotors() {
+  // the output from the PID controller is between 0 and 255, so the direction is chosen based on whether angle is pos or neg
+  if (angle > 0) {
+    analogWrite(leftMotorIn1, output);
     digitalWrite(leftMotorIn2, LOW);
 
-    analogWrite(rightMotorIn1, speed);
+    analogWrite(rightMotorIn1, output);
     digitalWrite(rightMotorIn2, LOW);
 
-    Serial.print("forward - speed: ");
-    Serial.println(speed);
-  } else if (speed < 0) {
+    Serial.print("forward - PWM value: ");
+    Serial.println(output);
+  } else if (angle < 0) {
     digitalWrite(leftMotorIn1, LOW);
-    analogWrite(leftMotorIn2, abs(speed));
+    analogWrite(leftMotorIn2, output);
 
     digitalWrite(rightMotorIn1, LOW);
-    analogWrite(rightMotorIn2, abs(speed));
+    analogWrite(rightMotorIn2, output);
 
-    Serial.print("reverse - speed: ");
-    Serial.println(abs(speed));
+    Serial.print("reverse - PWM value: ");
+    Serial.println(output);
   } else {
     stopMotors();
   }
@@ -73,16 +61,30 @@ void stopMotors() {
 }
 
 
+// the setup function that initializes pins and starts holding the brakes
+void setup() {
+  Serial.begin(9600);
+
+  pinMode(leftMotorIn1, OUTPUT);
+  pinMode(leftMotorIn2, OUTPUT);
+  pinMode(rightMotorIn1, OUTPUT);
+  pinMode(rightMotorIn2, OUTPUT);
+
+  stopMotors();
+
+  Serial.println("robot cart controller initialized");
+}
+
+
 void loop() {
-  // int potValue = analogRead(potPin);
-  // Serial.print("\npotentiometer value: ");
-  // Serial.println(potValue);
-
   angle = map(analogRead(potPin), 0, 1023, -900, 900) / 10.0;
-  Serial.print("\nangle: ")
-  Serial.println(angle)
+  Serial.print("angle: ");
+  Serial.println(angle);
 
+  // throw in the angle and get out a value between 0 and 255 (by default). the arduino by default only sends 8-bit PWM values (0 - 255)
   pid.Compute();
+  
+  setMotors();
 
   delay(100);
 }
