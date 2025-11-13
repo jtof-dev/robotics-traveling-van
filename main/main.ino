@@ -12,35 +12,35 @@ double output, scaleFactor;
 double setPoint = 0;
 
 // very preliminary values for Kp, Ki, and Kd. will require lots of tinkering
-double Kp = 10.0;
+double Kp = 4.9;
 double Ki = 0.1;
-double Kd = 0.5;
+double Kd = 0.4;
 
 double angle;
 double motorCommand;
 
 // the PID controller expects an angle input, so my calculated angle will work as the input
-PID pid(&angle, &output, &setPoint, Kp, Ki, Kd, DIRECT);
+PID pid(&angle, &output, &setPoint, Kp, Ki, Kd, REVERSE);
 
 
 // function to set motor speed using PWM values, pos numbers to move forward and neg numbers to move backward
 void setMotors() {
   // the output from the PID controller is between 0 and 255, so the direction is chosen based on whether angle is pos or neg
-  if (angle > 0) {
-    analogWrite(leftMotorIn1, output);
+  if (output > 0) {
+    analogWrite(leftMotorIn1, abs(output));
     digitalWrite(leftMotorIn2, LOW);
 
-    analogWrite(rightMotorIn1, output);
+    analogWrite(rightMotorIn1, abs(output));
     digitalWrite(rightMotorIn2, LOW);
 
     Serial.print("forward - PWM value: ");
     Serial.println(output);
-  } else if (angle < 0) {
+  } else if (output < 0) {
     digitalWrite(leftMotorIn1, LOW);
-    analogWrite(leftMotorIn2, output);
+    analogWrite(leftMotorIn2, abs(output));
 
     digitalWrite(rightMotorIn1, LOW);
-    analogWrite(rightMotorIn2, output);
+    analogWrite(rightMotorIn2, abs(output));
 
     Serial.print("reverse - PWM value: ");
     Serial.println(output);
@@ -51,13 +51,13 @@ void setMotors() {
 
 
 void stopMotors() {
-  digitalwrite(leftmotorin1, high);
-  digitalwrite(leftmotorin2, high);
+  digitalWrite(leftMotorIn1, HIGH);
+  digitalWrite(leftMotorIn2, HIGH);
 
-  digitalwrite(rightmotorin1, high);
-  digitalwrite(rightmotorin2, high);
+  digitalWrite(rightMotorIn1, HIGH);
+  digitalWrite(rightMotorIn2, HIGH);
   
-  serial.println("motors braking");
+  Serial.println("motors braking");
 }
 
 // this funciton probably won't be used, but the function exists in the motor driver so I mapped it here
@@ -68,7 +68,7 @@ void coastMotors() {
   digitalWrite(rightMotorIn1, LOW);
   digitalWrite(rightMotorIn2, LOW);
 
-  serial.println("motors braking");
+  Serial.println("motors coasting");
 }
 
 
@@ -80,6 +80,9 @@ void setup() {
   pinMode(leftMotorIn2, OUTPUT);
   pinMode(rightMotorIn1, OUTPUT);
   pinMode(rightMotorIn2, OUTPUT);
+
+  pid.SetMode(AUTOMATIC);
+  pid.SetOutputLimits(-255, 255);
 
   stopMotors();
 
@@ -94,8 +97,11 @@ void loop() {
 
   // throw in the angle and get out a value between 0 and 255 (by default). the arduino by default only sends 8-bit PWM values (0 - 255)
   pid.Compute();
+
+  Serial.print("PID controller output: ");
+  Serial.println(output);
   
   setMotors();
 
-  delay(100);
+  delay(1500);
 }
