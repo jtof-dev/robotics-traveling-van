@@ -25,5 +25,9 @@ the code needed to power an inverted pendulum robot with four motors
 
 - [x] implement the PID_V1.h PID controller function call
 - [x] take PID controller output and call motors
+- [ ] bugfix for initial hardware test
+- [ ] implement encoder software
+  - the encoder requires a 3.3V, GND, and outputs two signals phased 100deg apart
+    - I will likely use A1 and A2 for these
 - [ ] write code that keeps robot from rolling too far in either direction
 - [ ] implement touch screen and UI
