@@ -13,6 +13,13 @@ the code needed to power an inverted pendulum robot with four motors
 - reverse: IN1 = LOW, IN2 = PWM signal
 - brake (Stop): IN1 = LOW, IN2 = LOW
 
+| IN1 | IN2 |  OUT1  |  OUT2  | DESCRIPTION                                                   |
+| :-: | :-: | :----: | :----: | :------------------------------------------------------------ |
+|  0  |  0  | High-Z | High-Z | Coast; H-bridge disabled to High-Z (sleep entered after 1 ms) |
+|  0  |  1  |   L    |   H    | Reverse (Current OUT2 --> OUT1)                               |
+|  1  |  0  |   H    |   L    | Forward (Current OUT1 --> OUT2)                               |
+|  1  |  1  |   L    |   L    | Brake; low-side slow decay                                    |
+
 ## pin configuration
 
 - potentiometer: A0

@@ -51,13 +51,24 @@ void setMotors() {
 
 
 void stopMotors() {
+  digitalwrite(leftmotorin1, high);
+  digitalwrite(leftmotorin2, high);
+
+  digitalwrite(rightmotorin1, high);
+  digitalwrite(rightmotorin2, high);
+  
+  serial.println("motors braking");
+}
+
+// this funciton probably won't be used, but the function exists in the motor driver so I mapped it here
+void coastMotors() {
   digitalWrite(leftMotorIn1, LOW);
   digitalWrite(leftMotorIn2, LOW);
 
   digitalWrite(rightMotorIn1, LOW);
   digitalWrite(rightMotorIn2, LOW);
-  
-  Serial.println("motors stopped");
+
+  serial.println("motors braking");
 }
 
 
