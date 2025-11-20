@@ -1,6 +1,6 @@
 # robotics traveling van inverted pendulum robot
 
-the code needed to power an inverted pendulum robot with four motors
+the code needed to power an inverted pendulum robot with four (or two) motors
 
 - this code is made much simpler thanks to [this PID controller library](https://github.com/br3ttb/Arduino-PID-Library)
 - I referenced [Ian Carey's inverted pendulum code](https://gist.github.com/careyi3/d087f707b33c665915bd611e5514a355) for help with organizing the code, thank you!!
@@ -9,10 +9,6 @@ the code needed to power an inverted pendulum robot with four motors
 
 ## DRV8871 motor driver
 
-- forward: IN1 = PWM signal, IN2 = LOW
-- reverse: IN1 = LOW, IN2 = PWM signal
-- brake (Stop): IN1 = LOW, IN2 = LOW
-
 | IN1 | IN2 |  OUT1  |  OUT2  | DESCRIPTION                                                   |
 | :-: | :-: | :----: | :----: | :------------------------------------------------------------ |
 |  0  |  0  | High-Z | High-Z | Coast; H-bridge disabled to High-Z (sleep entered after 1 ms) |
@@ -20,9 +16,16 @@ the code needed to power an inverted pendulum robot with four motors
 |  1  |  0  |   H    |   L    | Forward (Current OUT1 --> OUT2)                               |
 |  1  |  1  |   L    |   L    | Brake; low-side slow decay                                    |
 
+## GM3865-520 dc motor encoder
+
+- outputs two data signals phased 100deg apart
+
 ## pin configuration
 
 - potentiometer: A0
+- encoder output A: A1
+- encoder output B: A2
+
 - left motor 1: D3 (PWM)
 - left motor 1: D5 (PWM)
 - right motor 1: D6 (PWM)
@@ -32,9 +35,11 @@ the code needed to power an inverted pendulum robot with four motors
 
 - [x] implement the PID_V1.h PID controller function call
 - [x] take PID controller output and call motors
-- [ ] bugfix for initial hardware test
-- [ ] implement encoder software
-  - the encoder requires a 3.3V, GND, and outputs two signals phased 100deg apart
-    - I will likely use A1 and A2 for these
-- [ ] write code that keeps robot from rolling too far in either direction
+- [x] bugfix for initial hardware test
+- [x] implement initial encoder software
+- [x] implement code that keeps robot from rolling too far in either direction
+- [ ] implement function to prevent robot from going too far in either direction
+
+## future to-do
+
 - [ ] implement touch screen and UI
