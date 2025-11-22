@@ -8,8 +8,8 @@ const int encoderPinA = A1;
 const int encoderPinB = A2;
 const int leftMotorIn1 = 3;
 const int leftMotorIn2 = 5;
-const int rightMotorIn1 = 6;
-const int rightMotorIn2 = 9;
+// const int rightMotorIn1 = 6;
+// const int rightMotorIn2 = 9;
 
 double output, scaleFactor;
 double setPoint = 0;
@@ -45,8 +45,8 @@ void setMotors() {
     analogWrite(leftMotorIn1, abs(output));
     digitalWrite(leftMotorIn2, LOW);
 
-    analogWrite(rightMotorIn1, abs(output));
-    digitalWrite(rightMotorIn2, LOW);
+    // analogWrite(rightMotorIn1, abs(output));
+    // digitalWrite(rightMotorIn2, LOW);
 
     Serial.print("forward - PWM value: ");
     Serial.println(output);
@@ -54,8 +54,8 @@ void setMotors() {
     digitalWrite(leftMotorIn1, LOW);
     analogWrite(leftMotorIn2, abs(output));
 
-    digitalWrite(rightMotorIn1, LOW);
-    analogWrite(rightMotorIn2, abs(output));
+    // digitalWrite(rightMotorIn1, LOW);
+    // analogWrite(rightMotorIn2, abs(output));
 
     Serial.print("reverse - PWM value: ");
     Serial.println(output);
@@ -69,8 +69,8 @@ void stopMotors() {
   digitalWrite(leftMotorIn1, HIGH);
   digitalWrite(leftMotorIn2, HIGH);
 
-  digitalWrite(rightMotorIn1, HIGH);
-  digitalWrite(rightMotorIn2, HIGH);
+  // digitalWrite(rightMotorIn1, HIGH);
+  // digitalWrite(rightMotorIn2, HIGH);
   
   Serial.println("motors braking");
 }
@@ -81,8 +81,8 @@ void coastMotors() {
   digitalWrite(leftMotorIn1, LOW);
   digitalWrite(leftMotorIn2, LOW);
 
-  digitalWrite(rightMotorIn1, LOW);
-  digitalWrite(rightMotorIn2, LOW);
+  // digitalWrite(rightMotorIn1, LOW);
+  // digitalWrite(rightMotorIn2, LOW);
 
   Serial.println("motors coasting");
 }
@@ -122,8 +122,8 @@ void setup() {
 
   pinMode(leftMotorIn1, OUTPUT);
   pinMode(leftMotorIn2, OUTPUT);
-  pinMode(rightMotorIn1, OUTPUT);
-  pinMode(rightMotorIn2, OUTPUT);
+  // pinMode(rightMotorIn1, OUTPUT);
+  // pinMode(rightMotorIn2, OUTPUT);
 
   pinMode(encoderPinA, INPUT_PULLUP);
   pinMode(encoderPinB, INPUT_PULLUP);
@@ -155,6 +155,9 @@ void loop() {
     Serial.println(output);
   
     // now, check if the robot is within a certain distance of the max distance and add some extra motor power if so (for future)
+    
+    // possibly, multiply or divide the output by a constant since four motor drivers are reading from the same pins
+    // output = output / 4;
 
     setMotors();
 
