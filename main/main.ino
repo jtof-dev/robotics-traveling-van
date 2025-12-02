@@ -15,11 +15,12 @@ double output;
 double mappedOutput;
 double scaleFactor;
 // use this variable to set what angle the pot reads while the pendulum is perfectly balanced
-const double setPoint = -10;
+const double setPoint = -2;
+const double mappedBound = 70;
 
 // define constants for the encoder
 const int countsPerRevolution = 520 * 4.0;
-int maxDistanceMM = 12.f * 25.4f;
+int maxDistanceMM = 10.f * 25.4f;
 volatile long encoderCount = 0;
 long robotDistanceMM = 0;
 // int isRobotWithinMaxDistance = 1;
@@ -30,9 +31,9 @@ const float wheelCircumferenceMM = PI * wheelDiameterMM;
 const float mmPerCount = wheelCircumferenceMM / countsPerRevolution;
 
 // very preliminary values for Kp, Ki, and Kd. will require lots of tinkering
-const double Kp = 4.9;
+const double Kp = 40.0;
 const double Ki = 0.1;
-const double Kd = 0.4;
+const double Kd = 0.5;
 
 double angle;
 double motorCommand;
@@ -44,26 +45,26 @@ PID pid(&angle, &output, &setPoint, Kp, Ki, Kd, REVERSE);
 // function to set motor speed using PWM values, pos numbers to move forward and neg numbers to move backward
 void setMotors() {
   // the output from the PID controller is between 0 and 255, so the direction is chosen based on whether angle is pos or neg
-  if (output > 0) {
+  if (mappedOutput > 0) {
     analogWrite(leftMotorIn1, mappedOutput);
     digitalWrite(leftMotorIn2, LOW);
 
     // analogWrite(rightMotorIn1, mappedOutput);
     // digitalWrite(rightMotorIn2, LOW);
 
-    Serial.print("forward - PWM value: ");
-    Serial.println(output);
-  } else if (output < 0) {
+    // Serial.print("forward - PWM value: ");
+    // Serial.println(output);
+  } else if (mappedOutput < 0) {
     digitalWrite(leftMotorIn1, LOW);
-    analogWrite(leftMotorIn2, mappedOutput);
+    analogWrite(leftMotorIn2, abs(mappedOutput));
 
     // digitalWrite(rightMotorIn1, LOW);
     // analogWrite(rightMotorIn2, mappedOutput);
 
-    Serial.print("reverse - PWM value: ");
-    Serial.println(output);
+    // Serial.print("reverse - PWM value: ");
+    // Serial.println(output);
   } else {
-    stopMotors();
+    coastMotors();
   }
 }
 
@@ -151,32 +152,41 @@ void loop() {
     Serial.print("angle: ");
     Serial.println(angle);
 
-    if (abs(angle) > 45) {
+    if (abs(angle - setPoint) > 45) {
       stopMotors();
       maxDistanceMM = 0;
+      Serial.println("pendulum tipped past 45deg");
     }
 
     // throw in the angle and get out a value between 0 and 255 (by default). the arduino by default only sends 8-bit PWM values (0 - 255)
     pid.Compute();
 
-    Serial.print("PID controller output: ");
-    Serial.println(output);
-    Serial.print("\n");
+    // Serial.print("PID controller output: ");
+    // Serial.println(output);
+    // Serial.print("\n");
 
     Serial.print("distance travelled: ");
     Serial.println(robotDistanceMM);
   
     // map the output range onto [70, 255] 
-    if (output > 0) {
-      mappedOutput = map(output, 0, 255, 70, 255);
+    if (output > setPoint) {
+      mappedOutput = map(output, setPoint, 255, mappedBound, 255);
     } 
-    else if (output < 0) {
-      mappedOutput = map(output, -255, 0, -255, -70);
-    } 
-    // snap low values to 0 to avoid extra oscillations
-    else if (abs(output) < 2) {
+    else if (output < setPoint) {
+      mappedOutput = map(output, -255, setPoint, -255, -mappedBound);
+    }
+    
+    if (abs(output) < 5) {
       mappedOutput = 0;
-    };
+    }
+
+    Serial.print("mapped output PWM value: ");
+    Serial.println(mappedOutput);
+    Serial.print("\n\n");
+    // snap low values to 0 to avoid extra oscillations
+    // else if (abs(output) < abs(setPoint) + 2) {
+    //   mappedOutput = 0;
+    // };
 
     // now, check if the robot is within a certain distance of the max distance and add some extra motor power if so (for future)
 
