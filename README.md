@@ -45,12 +45,12 @@ the code needed to power an inverted pendulum robot with four (or two) motors. c
 
 ## DRV8871 motor driver
 
-| IN1 | IN2 |  OUT1  |  OUT2  | DESCRIPTION                                                   |
-| :-: | :-: | :----: | :----: | :------------------------------------------------------------ |
-|  0  |  0  | High-Z | High-Z | Coast; H-bridge disabled to High-Z (sleep entered after 1 ms) |
-|  0  |  1  |   L    |   H    | Reverse (Current OUT2 --> OUT1)                               |
-|  1  |  0  |   H    |   L    | Forward (Current OUT1 --> OUT2)                               |
-|  1  |  1  |   L    |   L    | Brake; low-side slow decay                                    |
+| IN1 | IN2 |  OUT1  |  OUT2  | DESCRIPTION |
+| :-: | :-: | :----: | :----: | :---------- |
+|  0  |  0  | high-z | high-z | coast       |
+|  0  |  1  |   L    |   H    | reverse     |
+|  1  |  0  |   H    |   L    | forward     |
+|  1  |  1  |   L    |   L    | brake       |
 
 ## GM3865-520 dc motor encoder
 
