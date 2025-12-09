@@ -15,15 +15,17 @@ double output;
 double mappedOutput;
 double scaleFactor;
 // use this variable to set what angle the pot reads while the pendulum is perfectly balanced
-const double setPoint = -2;
+const double setPoint = -6.0;
 const double mappedBound = 70;
 
 // define constants for the encoder
 const int countsPerRevolution = 520 * 4.0;
-int maxDistanceMM = 10.f * 25.4f;
+int maxDistanceMM = 12.f * 25.4f;
 volatile long encoderCount = 0;
 long robotDistanceMM = 0;
 // int isRobotWithinMaxDistance = 1;
+
+int motorSerial = 0;
 
 // define constants for correlating distance and encoder values
 const float wheelDiameterMM = 65.0;
@@ -31,7 +33,7 @@ const float wheelCircumferenceMM = PI * wheelDiameterMM;
 const float mmPerCount = wheelCircumferenceMM / countsPerRevolution;
 
 // very preliminary values for Kp, Ki, and Kd. will require lots of tinkering
-const double Kp = 40.0;
+const double Kp = 15.0;
 const double Ki = 0.1;
 const double Kd = 0.5;
 
@@ -75,8 +77,11 @@ void stopMotors() {
 
   // digitalWrite(rightMotorIn1, HIGH);
   // digitalWrite(rightMotorIn2, HIGH);
-  
-  Serial.println("motors braking");
+
+  if (motorSerial == 0) {
+    motorSerial = 1;
+    Serial.println("motors braking");
+  }
 }
 
 
@@ -147,12 +152,13 @@ void setup() {
 void loop() {
   robotDistanceMM = getDistanceTraveledMM();
 
-  if (fabs(robotDistanceMM) < maxDistanceMM) {
     angle = map(analogRead(potPin), 0, 1023, -900, 900) / 10.0;
     Serial.print("angle: ");
     Serial.println(angle);
 
-    if (abs(angle - setPoint) > 45) {
+  if (fabs(robotDistanceMM) < maxDistanceMM) {
+
+    if (abs(angle - setPoint) > 55) {
       stopMotors();
       maxDistanceMM = 0;
       Serial.println("pendulum tipped past 45deg");
@@ -169,30 +175,26 @@ void loop() {
     Serial.println(robotDistanceMM);
   
     // map the output range onto [70, 255] 
-    if (output > setPoint) {
-      mappedOutput = map(output, setPoint, 255, mappedBound, 255);
-    } 
-    else if (output < setPoint) {
-      mappedOutput = map(output, -255, setPoint, -255, -mappedBound);
-    }
+    // if (output > setPoint) {
+    //   mappedOutput = map(output, setPoint, 255, mappedBound, 255);
+    // } 
+    // else if (output < setPoint) {
+    //   mappedOutput = map(output, -255, setPoint, -255, -mappedBound);
+    // }
     
-    if (abs(output) < 5) {
-      mappedOutput = 0;
-    }
+    // if (abs(output) < 5) {
+    //   mappedOutput = 0;
+    // }
 
     Serial.print("mapped output PWM value: ");
     Serial.println(mappedOutput);
     Serial.print("\n\n");
     // snap low values to 0 to avoid extra oscillations
-    // else if (abs(output) < abs(setPoint) + 2) {
-    //   mappedOutput = 0;
-    // };
-
-    // now, check if the robot is within a certain distance of the max distance and add some extra motor power if so (for future)
+    if (abs(output) < abs(setPoint) + 2) {
+      mappedOutput = 0;
+    };
 
     setMotors();
-
-    // delay(500);
   } else {
     stopMotors();
     delay(2000);
