@@ -1,9 +1,45 @@
 # robotics traveling van inverted pendulum robot
 
-the code needed to power an inverted pendulum robot with four (or two) motors
+the code needed to power an inverted pendulum robot with four (or two) motors. currently written for an arduino uno, but will later be rewritten for a difference board (unsure on which one yet)
 
 - this code is made much simpler thanks to [this PID controller library](https://github.com/br3ttb/Arduino-PID-Library)
 - I referenced [Ian Carey's inverted pendulum code](https://gist.github.com/careyi3/d087f707b33c665915bd611e5514a355) for help with organizing the code, thank you!!
+
+```ascii flowchart
+                                     ┌─────────┐          ┌──────────────────┐
+                                     │         │          │                  │
+                                     │ setup() ├────┬────►│ initialize pins  │
+                                     │         │    │     │                  │
+                                     └────┬────┘    │     └──────────────────┘
+                                          │         │
+                                          │         │
+                                          │         │     ┌───────────────────┐
+                                          │         │     │                   │
+                                          │         └────►│ send brake signal │
+                                          │               │     to motors     │
+                                          │               │                   │
+                                          │               └───────────────────┘
+                                          │
+                                          │
+                                          │
+                                          ▼
+┌─────────────────────────┐          ┌────────┐           ┌────────────────────────────┐
+│                         │          │        │           │                            │
+│ send specific speed PWM ├─────────►│ loop() ┼──────────►│ read potentiometer values  │
+│     value to motors     │          │        │           │                            │
+│                         │          └────────┘           └──────────────────┬─────────┘
+└─────────────────────────┘                                                  │
+       ▲                                                                     │
+       │                                                                     │
+       │                                                                     │
+       │                                                                     │
+       │                                                                     │
+       │     ┌─────────────────────┐            ┌─────────────────────┐      │
+       │     │                     │            │                     │      │
+       └─────┤ adjust output value │◄───────────┤ run PID calculation │◄─────┘
+             │                     │            │                     │
+             └─────────────────────┘            └─────────────────────┘
+```
 
 # notes to self
 
@@ -18,28 +54,20 @@ the code needed to power an inverted pendulum robot with four (or two) motors
 
 ## GM3865-520 dc motor encoder
 
-- outputs two data signals phased 100deg apart
+- the encoder outputs two data signals phased 100deg apart
 
 ## pin configuration
 
 - potentiometer: A0
-- encoder output A: A1
-- encoder output B: A2
+- encoder output A: D2
+- encoder output B: D3
 
-- left motor 1: D3 (PWM)
 - left motor 1: D5 (PWM)
-- right motor 1: D6 (PWM)
-- right motor 1: D9 (PWM)
+- left motor 1: D6 (PWM)
 
 # to-do
 
-- [x] implement the PID_V1.h PID controller function call
-- [x] take PID controller output and call motors
-- [x] bugfix for initial hardware test
-- [x] implement initial encoder software
-- [x] implement code that keeps robot from rolling too far in either direction
-- [ ] implement function to prevent robot from going too far in either direction
-
-## future to-do
-
+- [ ] add code to self-correct robot when far away from origin
+- [ ] change code to use a digital encoder instead of a potentiometer
+- [ ] migrate code to use a different board
 - [ ] implement touch screen and UI
