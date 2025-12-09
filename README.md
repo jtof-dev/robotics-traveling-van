@@ -16,12 +16,6 @@ the code needed to power an inverted pendulum robot with four (or two) motors. c
                                           │                                             
                                           │                                             
                                           │                                             
-                                          │                                             
-                                          │                                             
-                                          │                                             
-                                          │                                             
-                                          │                                             
-                                          │                                             
                                           ▼                                             
 ┌─────────────────────────┐          ┌────────┐           ┌────────────────────────────┐
 │                         │          │        │           │                            │
